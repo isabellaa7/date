@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Would you go out with me again?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fff1f4; --bg2:#ffd9e4; --ink:#3a0b27; --muted:#8a5570; --card:#ffffffcc;
+  --line:#f1bfd0; --accent:#e5316b; --accent-ink:#ffffff; --soft:#ffe3ec;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1c0916; --bg2:#32102a; --ink:#ffe6ee; --muted:#d6a3ba; --card:#2a0f24cc;
+    --line:#5a2849; --accent:#ff5b8f; --accent-ink:#2a0618; --soft:#3e1632;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1c0916; --bg2:#32102a; --ink:#ffe6ee; --muted:#d6a3ba; --card:#2a0f24cc;
+  --line:#5a2849; --accent:#ff5b8f; --accent-ink:#2a0618; --soft:#3e1632;
+  color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*,*::before,*::after{box-sizing:border-box}
+body{
+  margin:0;min-height:100%;font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color:var(--ink);background:var(--bg);
+  background-image:radial-gradient(900px 600px at 15% -10%,var(--bg2),transparent 60%),radial-gradient(700px 500px at 100% 100%,var(--bg2),transparent 60%);
+  background-attachment:fixed;
+  display:flex;align-items:center;justify-content:center;
+}
+main{width:100%;max-width:520px;padding:28px 20px 40px}
+.screen{display:none;animation:in .35s ease}
+.screen.on{display:block}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h1{
+  font-weight:800;font-size:clamp(2.6rem,12vw,4.6rem);line-height:.98;letter-spacing:-.04em;
+  margin:0 0 36px;text-wrap:balance;
+}
+h2{font-weight:800;font-size:clamp(1.9rem,8vw,2.6rem);letter-spacing:-.03em;line-height:1.02;margin:0 0 8px}
+.sub{color:var(--muted);margin:0 0 22px;font-size:1.05rem}
+.btns{display:flex;gap:14px;align-items:center}
+button{font:inherit;cursor:pointer}
+.btn{
+  border:0;border-radius:999px;padding:16px 38px;font-weight:600;font-size:1.15rem;
+  transition:transform .15s ease,box-shadow .15s ease;
+}
+.btn:focus-visible,.day:focus-visible,.chip:focus-visible,.nav:focus-visible,.idea:focus-within{outline:3px solid var(--ink);outline-offset:3px}
+.yes{background:var(--accent);color:var(--accent-ink);box-shadow:0 10px 28px -10px var(--accent)}
+.yes:hover{transform:scale(1.06)}
+.yes:active{transform:scale(.98)}
+.no{background:var(--soft);color:var(--ink);border:1.5px solid var(--line)}
+.slot{display:inline-block}
+.no.fly{position:fixed;z-index:50;transition:left .2s ease,top .2s ease;margin:0}
+.hint{min-height:1.5em;margin-top:26px;color:var(--muted);font-size:.98rem}
+
+.cal{background:var(--card);border:1.5px solid var(--line);border-radius:26px;padding:16px;backdrop-filter:blur(6px)}
+.calhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.calhead strong{font-size:1.15rem;font-weight:600}
+.nav{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--line);background:transparent;color:var(--ink);font-size:1.2rem}
+.nav:disabled{opacity:.3;cursor:default}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.dow{font-size:.8rem;color:var(--muted);padding:4px 0}
+.day{aspect-ratio:1;border:0;border-radius:50%;background:transparent;color:var(--ink);font-size:1rem}
+.day:disabled{opacity:.28;cursor:default}
+.day:not(:disabled):hover{background:var(--soft)}
+.day.today{box-shadow:inset 0 0 0 1.5px var(--accent)}
+.day.sel{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.times{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 22px}
+.chip{border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:10px 16px;font-size:.98rem}
+.chip.sel{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn[disabled]{opacity:.4;cursor:default;transform:none;box-shadow:none}
+.label{font-weight:600;margin:0 0 4px}
+
+.ideas{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 18px}
+.idea{position:relative;border:1.5px solid var(--line);background:var(--card);border-radius:20px;padding:14px 12px;cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:transform .12s}
+.idea input{position:absolute;opacity:0;inset:0;cursor:pointer}
+.idea .em{font-size:1.7rem}
+.idea .t{font-weight:600;line-height:1.15}
+.idea:has(input:checked){background:var(--accent);color:var(--accent-ink);border-color:var(--accent);transform:scale(1.02)}
+textarea{width:100%;font:inherit;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:12px 14px;resize:vertical;min-height:84px;margin-bottom:20px}
+textarea::placeholder{color:var(--muted)}
+.recap{background:var(--card);border:1.5px solid var(--line);border-radius:22px;padding:18px;margin:6px 0 22px;font-size:1.15rem;line-height:1.35}
+.recap small{display:block;color:var(--muted);font-size:.95rem;margin-top:6px}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+a.btn{text-decoration:none;display:inline-block}
+.ghost{background:transparent;border:1.5px solid var(--line);color:var(--ink)}
+@media (prefers-reduced-motion:reduce){.screen{animation:none}.no.fly{transition:none}.yes:hover,.idea:has(input:checked){transform:none}}
+</style>
+</head>
+<body>
+<main>
+
+<section class="screen on" id="s1">
+  <h1>would you go out with me again?</h1>
+  <div class="btns">
+    <button class="btn yes" id="yes" type="button">Yes</button>
+    <span class="slot" id="slot"><button class="btn no" id="no" type="button">No</button></span>
+  </div>
+  <p class="hint" id="hint"></p>
+</section>
+
+<section class="screen" id="s2">
+  <h2>Great. Pick a day.</h2>
+  <p class="sub">Choose the date and time that work for you.</p>
+  <div class="cal">
+    <div class="calhead">
+      <button class="nav" id="prev" type="button" aria-label="Previous month">‹</button>
+      <strong id="month"></strong>
+      <button class="nav" id="next" type="button" aria-label="Next month">›</button>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+  <div class="times" id="times" role="group" aria-label="Time"></div>
+  <button class="btn yes" id="confirm" type="button" disabled>Confirm date</button>
+</section>
+
+<section class="screen" id="s3">
+  <h2>Now, what sounds fun?</h2>
+  <p class="sub" id="picked"></p>
+  <form id="form" onsubmit="return false">
+    <div class="ideas" id="ideas"></div>
+    <p class="label">Anything I should know?</p>
+    <textarea id="note" placeholder="Favorite foods, places, allergies…"></textarea>
+    <button class="btn yes" id="lock" type="button" disabled>Lock it in</button>
+  </form>
+</section>
+
+<section class="screen" id="s4">
+  <h2>It’s a date.</h2>
+  <div class="recap" id="recap"></div>
+  <div class="row">
+    <a class="btn yes" id="wa" href="#" target="_blank" rel="noopener">Send my answer</a>
+    <button class="btn ghost" id="copy" type="button">Copy message</button>
+  </div>
+</section>
+
+</main>
+<script>
+// Optional: put your number with country code, digits only (e.g. "5215512345678") so WhatsApp opens your chat.
+var HIS_NUMBER = "34722413998";
+
+var $ = function(id){ return document.getElementById(id); };
+function show(id){
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('on'); });
+  $(id).classList.add('on');
+  window.scrollTo(0,0);
+}
+
+/* ---------- Screen 1: the shy "No" ---------- */
+var no = $('no'), yes = $('yes'), slot = $('slot'), hint = $('hint');
+var dodges = 0, flying = false;
+var lines = ['', '', 'Hm, the “No” button seems shy.', 'It really doesn’t want to be clicked.', 'Okay, that’s four. Just press “Yes”.', 'You can’t catch it. Believe me.'];
+
+function dodge(px, py){
+  if(!flying){
+    slot.style.width = no.offsetWidth + 'px';
+    slot.style.height = no.offsetHeight + 'px';
+    var r = no.getBoundingClientRect();
+    no.classList.add('fly');
+    no.style.left = r.left + 'px';
+    no.style.top = r.top + 'px';
+    flying = true;
+  }
+  var w = no.offsetWidth, h = no.offsetHeight, pad = 14, topPad = 60;
+  var vw = window.innerWidth, vh = window.innerHeight;
+  var yr = yes.getBoundingClientRect();
+  var x = 0, y = 0;
+  for(var i = 0; i < 40; i++){
+    x = pad + Math.random() * (vw - w - pad * 2);
+    y = topPad + Math.random() * (vh - h - topPad - pad);
+    var cx = x + w/2, cy = y + h/2;
+    var far = Math.hypot(cx - px, cy - py) > 170;
+    var overlap = x < yr.right + 24 && x + w > yr.left - 24 && y < yr.bottom + 24 && y + h > yr.top - 24;
+    if(far && !overlap) break;
+  }
+  no.style.left = x + 'px';
+  no.style.top = y + 'px';
+  dodges++;
+  hint.textContent = lines[Math.min(dodges, lines.length - 1)];
+}
+
+document.addEventListener('pointermove', function(e){
+  if(!$('s1').classList.contains('on')) return;
+  var r = no.getBoundingClientRect();
+  var d = Math.hypot(e.clientX - (r.left + r.width/2), e.clientY - (r.top + r.height/2));
+  if(d < 95) dodge(e.clientX, e.clientY);
+});
+no.addEventListener('pointerdown', function(e){ e.preventDefault(); dodge(e.clientX, e.clientY); });
+no.addEventListener('click', function(e){ e.preventDefault(); var r = no.getBoundingClientRect(); dodge(r.left, r.top); });
+no.addEventListener('focus', function(){ var r = no.getBoundingClientRect(); dodge(r.left + r.width/2, r.top + r.height/2); no.blur(); });
+window.addEventListener('resize', function(){ if(flying){ var r = no.getBoundingClientRect(); dodge(r.left, r.top); } });
+
+yes.addEventListener('click', function(){ show('s2'); });
+
+/* ---------- Screen 2: calendar ---------- */
+var today = new Date(); today.setHours(0,0,0,0);
+var view = new Date(today.getFullYear(), today.getMonth(), 1);
+var pickedDate = null, pickedTime = null;
+var TIMES = ['1:00 PM','10:00 AM','5:00 PM','3:00 PM','9:00 AM','12:00 PM'];
+
+function renderCal(){
+  $('month').textContent = view.toLocaleDateString('en-US', {month:'long', year:'numeric'});
+  $('prev').disabled = view.getFullYear() === today.getFullYear() && view.getMonth() === today.getMonth();
+  var g = $('grid'); g.innerHTML = '';
+  ['S','M','T','W','T','F','S'].forEach(function(d){
+    var el = document.createElement('div'); el.className = 'dow'; el.textContent = d; g.appendChild(el);
+  });
+  var first = new Date(view.getFullYear(), view.getMonth(), 1).getDay();
+  var days = new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate();
+  for(var i = 0; i < first; i++) g.appendChild(document.createElement('div'));
+  for(var n = 1; n <= days; n++){
+    (function(n){
+      var d = new Date(view.getFullYear(), view.getMonth(), n);
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'day'; b.textContent = n;
+      if(d < today) b.disabled = true;
+      if(d.getTime() === today.getTime()) b.classList.add('today');
+      if(pickedDate && d.getTime() === pickedDate.getTime()) b.classList.add('sel');
+      b.addEventListener('click', function(){ pickedDate = d; renderCal(); check(); });
+      g.appendChild(b);
+    })(n);
+  }
+}
+$('prev').addEventListener('click', function(){ view = new Date(view.getFullYear(), view.getMonth() - 1, 1); renderCal(); });
+$('next').addEventListener('click', function(){ view = new Date(view.getFullYear(), view.getMonth() + 1, 1); renderCal(); });
+
+TIMES.forEach(function(t){
+  var c = document.createElement('button');
+  c.type = 'button'; c.className = 'chip'; c.textContent = t;
+  c.addEventListener('click', function(){
+    pickedTime = t;
+    document.querySelectorAll('.chip').forEach(function(x){ x.classList.toggle('sel', x === c); });
+    check();
+  });
+  $('times').appendChild(c);
+});
+function check(){ $('confirm').disabled = !(pickedDate && pickedTime); }
+function niceDate(){ return pickedDate.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'}) + ' at ' + pickedTime; }
+
+$('confirm').addEventListener('click', function(){
+  $('picked').textContent = niceDate();
+  show('s3');
+});
+renderCal();
+
+/* ---------- Screen 3: date ideas ---------- */
+var IDEAS = [
+  ['🎬','Movie night'], ['🍰','Try torta vasca'], ['🍣','Sushi date'],
+  ['🎳','Bowling (my humiliation ritual)'], ['☕','Coffee date'], ['🏰','Visit to the castle']
+];
+var idea = null;
+IDEAS.forEach(function(it){
+  var l = document.createElement('label'); l.className = 'idea';
+  l.innerHTML = '<input type="radio" name="idea"><span class="em"></span><span class="t"></span>';
+  l.querySelector('.em').textContent = it[0];
+  l.querySelector('.t').textContent = it[1];
+  l.querySelector('input').addEventListener('change', function(){ idea = it[0] + ' ' + it[1]; $('lock').disabled = false; });
+  $('ideas').appendChild(l);
+});
+
+/* ---------- Screen 4: recap ---------- */
+$('lock').addEventListener('click', function(){
+  var note = $('note').value.trim();
+  var msg = 'Yes! 💌 I’d love to go out again. ' + niceDate() + ' — ' + idea + '.' + (note ? ' Note: ' + note : '');
+  var r = $('recap'); r.innerHTML = '';
+  var main = document.createElement('div'); main.textContent = niceDate();
+  var plan = document.createElement('div'); plan.textContent = idea;
+  r.appendChild(main); r.appendChild(plan);
+  if(note){ var s = document.createElement('small'); s.textContent = note; r.appendChild(s); }
+  $('wa').href = 'https://wa.me/' + HIS_NUMBER + '?text=' + encodeURIComponent(msg);
+  $('copy').onclick = function(){
+    var done = function(){ $('copy').textContent = 'Copied'; };
+    try { navigator.clipboard.writeText(msg).then(done, done); } catch(e){ done(); }
+  };
+  show('s4');
+});
+</script>
+</body>
+</html>
